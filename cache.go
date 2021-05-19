@@ -28,12 +28,15 @@ type CachePolicy interface {
 	Victim() CacheKey
 	Add(CacheKey)
 	Remove(CacheKey)
+	Access(CacheKey)
 }
 
 func GetCachePolicy(policy PolicyType) CachePolicy {
 	switch policy {
 	case FIFO:
 		return NewFIFOPolicy()
+	case LRU:
+		return NewLRUPolicy()
 	default:
 		return NewFIFOPolicy()
 	}
@@ -61,6 +64,7 @@ func (c *Cache) Put(key CacheKey, value string) error {
 
 func (c *Cache) Get(key CacheKey) (*string, error) {
 	if value, ok := c.data[key]; ok {
+		c.policy.Access(key)
 		return &value, nil
 	}
 
