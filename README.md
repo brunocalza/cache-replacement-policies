@@ -6,10 +6,10 @@ Implementation of several cache replacement policies for learning purposes
 
 - First In First Out
 - LRU
+- LFU
 
 ## Future implementations
 
-- LFU
 - Clock
 
 ## First In First Out policy

@@ -37,6 +37,7 @@ func (p *FIFOPolicy) Remove(key CacheKey) {
 	node.prev.next = node.next
 	node.next = nil
 	node.prev = nil
+	delete(p.keyNode, key)
 }
 
 // Access indicates to the policer that the key was accessed

@@ -37,6 +37,8 @@ func GetCachePolicy(policy PolicyType) CachePolicy {
 		return NewFIFOPolicy()
 	case LRU:
 		return NewLRUPolicy()
+	case LFU:
+		return NewLFUPolicy()
 	default:
 		return NewFIFOPolicy()
 	}

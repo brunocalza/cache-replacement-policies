@@ -94,3 +94,37 @@ func TestLRUPolicy(t *testing.T) {
 		t.Errorf("value should be bar7, but we got %s", *value)
 	}
 }
+
+func TestLFUPolicy(t *testing.T) {
+	cache := NewCache(2, LFU)
+	cache.Put("foo1", "bar1")
+	cache.Put("foo2", "bar2")
+
+	if value, err := cache.Get("foo1"); *value != "bar1" || err != nil {
+		t.Errorf("value should be bar, but we got %s", *value)
+	}
+
+	cache.Put("foo3", "bar3")
+
+	if value, err := cache.Get("foo2"); value != nil || err == nil {
+		t.Error("value should be nil")
+	}
+
+	if value, err := cache.Get("foo3"); *value != "bar3" || err != nil {
+		t.Errorf("value should be bar, but we got %s", *value)
+	}
+
+	cache.Put("foo4", "bar4")
+
+	if value, err := cache.Get("foo1"); value != nil || err == nil {
+		t.Error("value should be nil")
+	}
+
+	if value, err := cache.Get("foo3"); *value != "bar3" || err != nil {
+		t.Errorf("value should be bar, but we got %s", *value)
+	}
+
+	if value, err := cache.Get("foo4"); *value != "bar4" || err != nil {
+		t.Errorf("value should be bar, but we got %s", *value)
+	}
+}
