@@ -12,6 +12,15 @@ Implementation of several cache replacement policies for learning purposes
 
 - Clock
 
+## TODOS
+
+- Make node generic
+- Refactor all implemenations to use generic node
+- Refactor FIFO and LRU to use remove
+- Refactor APIs for error handling
+- Make policies private?
+- Implement Clock Replacement Policy
+
 ## First In First Out policy
 
 Evicts the elements in the order that they were added to the cache policer
