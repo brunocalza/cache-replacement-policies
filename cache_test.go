@@ -3,7 +3,7 @@ package cache
 import "testing"
 
 func TestFIFOPolicy(t *testing.T) {
-	cache := NewCache(5, NewFIFOPolicy())
+	cache := NewCache(5, FIFO)
 	cache.Put("foo", "bar")
 	cache.Put("foo2", "bar2")
 	cache.Put("foo3", "bar3")

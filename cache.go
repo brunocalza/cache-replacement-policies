@@ -8,12 +8,6 @@ type CacheKey string
 
 type CacheData map[CacheKey]string
 
-type CachePolicy interface {
-	Victim() CacheKey
-	Add(CacheKey)
-	Remove(CacheKey)
-}
-
 type Cache struct {
 	maxSize int
 	size    int
@@ -21,10 +15,34 @@ type Cache struct {
 	data    CacheData
 }
 
-func NewCache(maxSize int, policy CachePolicy) *Cache {
+type PolicyType int
+
+const (
+	FIFO PolicyType = 1 << iota
+	LRU
+	LFU
+	CLOCK
+)
+
+type CachePolicy interface {
+	Victim() CacheKey
+	Add(CacheKey)
+	Remove(CacheKey)
+}
+
+func GetCachePolicy(policy PolicyType) CachePolicy {
+	switch policy {
+	case FIFO:
+		return NewFIFOPolicy()
+	default:
+		return NewFIFOPolicy()
+	}
+}
+
+func NewCache(maxSize int, policy PolicyType) *Cache {
 	cache := &Cache{}
 	cache.maxSize = maxSize
-	cache.policy = policy
+	cache.policy = GetCachePolicy(policy)
 	cache.data = make(CacheData, maxSize)
 	return cache
 }
