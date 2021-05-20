@@ -2,13 +2,12 @@ package cache
 
 type Frequency int
 
-type FreqNode struct {
-	freq Frequency
-	node *Node
+type LFUItem struct {
+	frequency Frequency
+	key       CacheKey
 }
 
 type LFUPolicy struct {
-	keyFreqNode    map[CacheKey]FreqNode
 	freqList       map[Frequency]*List
 	keyNode        map[CacheKey]*Node
 	leastFrequency Frequency
@@ -17,7 +16,7 @@ type LFUPolicy struct {
 // NewLFUPolicy creates a new LFU cache policer
 func NewLFUPolicy() CachePolicy {
 	policy := &LFUPolicy{}
-	policy.keyFreqNode = make(map[CacheKey]FreqNode)
+	policy.keyNode = make(map[CacheKey]*Node)
 	policy.freqList = make(map[Frequency]*List)
 	policy.leastFrequency = 1
 	return policy
@@ -25,7 +24,7 @@ func NewLFUPolicy() CachePolicy {
 
 // Victim selects a cache key for eviction using the LFU policy
 func (p *LFUPolicy) Victim() CacheKey {
-	return p.freqList[p.leastFrequency].Pop().(CacheKey)
+	return p.freqList[p.leastFrequency].Pop().(LFUItem).key
 }
 
 // Add adds a cache key to the policer, becoming a candidate for eviction
@@ -35,8 +34,8 @@ func (p *LFUPolicy) Add(key CacheKey) {
 		p.freqList[1] = NewList()
 	}
 
-	node := p.freqList[1].AppendLeft(key)
-	p.keyFreqNode[key] = FreqNode{1, node}
+	node := p.freqList[1].AppendLeft(LFUItem{1, key})
+	p.keyNode[key] = node
 	p.leastFrequency = 1
 }
 
@@ -47,28 +46,24 @@ func (p *LFUPolicy) Remove(key CacheKey) {
 
 // Access indicates to the policer that the key was accessed
 func (p *LFUPolicy) Access(key CacheKey) {
-	freqNode := p.remove(key)
+	node := p.remove(key)
 
-	node := freqNode.node
-	frequency := freqNode.freq
-
+	frequency := node.item.(LFUItem).frequency
 	_, ok := p.freqList[frequency+1]
 	if !ok {
 		p.freqList[frequency+1] = NewList()
 	}
 
-	node = p.freqList[frequency+1].AppendLeft(key)
-	p.keyFreqNode[key] = FreqNode{frequency + 1, node}
+	node = p.freqList[frequency+1].AppendLeft(LFUItem{frequency + 1, key})
+	p.keyNode[key] = node
 }
 
-func (p *LFUPolicy) remove(key CacheKey) FreqNode {
-	freqNode, _ := p.keyFreqNode[key]
-
-	node := freqNode.node
-	frequency := freqNode.freq
+func (p *LFUPolicy) remove(key CacheKey) *Node {
+	node := p.keyNode[key]
+	frequency := node.item.(LFUItem).frequency
 
 	p.freqList[frequency].Remove(node)
-	delete(p.keyFreqNode, key)
+	delete(p.keyNode, key)
 
 	if p.freqList[frequency].Size() == 0 {
 		delete(p.freqList, frequency)
@@ -77,5 +72,5 @@ func (p *LFUPolicy) remove(key CacheKey) FreqNode {
 		}
 	}
 
-	return freqNode
+	return node
 }
