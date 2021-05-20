@@ -25,7 +25,7 @@ func NewLFUPolicy() CachePolicy {
 
 // Victim selects a cache key for eviction using the LFU policy
 func (p *LFUPolicy) Victim() CacheKey {
-	return p.freqList[p.leastFrequency].Pop()
+	return p.freqList[p.leastFrequency].Pop().(CacheKey)
 }
 
 // Add adds a cache key to the policer, becoming a candidate for eviction

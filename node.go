@@ -1,7 +1,9 @@
 package cache
 
+type Item interface{}
+
 type Node struct {
-	key  CacheKey
+	item Item
 	next *Node
 	prev *Node
 }

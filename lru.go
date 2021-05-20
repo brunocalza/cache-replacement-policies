@@ -15,7 +15,7 @@ func NewLRUPolicy() CachePolicy {
 
 // Victim selects a cache key for eviction using the LRU policy
 func (p *LRUPolicy) Victim() CacheKey {
-	return p.list.Pop()
+	return p.list.Pop().(CacheKey)
 }
 
 // Add adds a cache key to the policer, becoming a candidate for eviction

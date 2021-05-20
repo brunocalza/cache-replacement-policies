@@ -16,22 +16,22 @@ func NewList() *List {
 	return l
 }
 
-func (l *List) AppendLeft(key CacheKey) *Node {
-	node := &Node{key, l.head.next, l.head}
+func (l *List) AppendLeft(item Item) *Node {
+	node := &Node{item, l.head.next, l.head}
 	l.head.next.prev = node
 	l.head.next = node
 	l.size++
 	return node
 }
 
-func (l *List) Pop() CacheKey {
+func (l *List) Pop() Item {
 	temp := l.tail.prev
 	l.tail.prev = temp.prev
 	temp.prev.next = l.tail
 	temp.next = nil
 	temp.prev = nil
 	l.size--
-	return temp.key
+	return temp.item
 }
 
 func (l *List) Remove(node *Node) {
