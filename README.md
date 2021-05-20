@@ -14,8 +14,6 @@ Implementation of several cache replacement policies for learning purposes
 
 ## TODOS
 
-- Make node generic
-- Refactor all implemenations to use generic node
 - Refactor FIFO and LRU to use remove
 - Refactor APIs for error handling
 - Make policies private?
