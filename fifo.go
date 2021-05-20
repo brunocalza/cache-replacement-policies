@@ -33,15 +33,11 @@ func (p *FIFOPolicy) Remove(key CacheKey) {
 	if !ok {
 		return
 	}
-	node.next.prev = node.prev
-	node.prev.next = node.next
-	node.next = nil
-	node.prev = nil
+	p.list.Remove(node)
 	delete(p.keyNode, key)
 }
 
 // Access indicates to the policer that the key was accessed
 // Since accessing the cache has no effect on the eviction policy it just returns
 func (p *FIFOPolicy) Access(key CacheKey) {
-	return // noop
 }

@@ -14,7 +14,6 @@ Implementation of several cache replacement policies for learning purposes
 
 ## TODOS
 
-- Refactor FIFO and LRU to use remove
 - Refactor APIs for error handling
 - Make policies private?
 - Implement Clock Replacement Policy

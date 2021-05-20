@@ -30,10 +30,7 @@ func (p *LRUPolicy) Remove(key CacheKey) {
 	if !ok {
 		return
 	}
-	node.next.prev = node.prev
-	node.prev.next = node.next
-	node.next = nil
-	node.prev = nil
+	p.list.Remove(node)
 	delete(p.keyNode, key)
 }
 
