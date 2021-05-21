@@ -1,29 +1,33 @@
 package cache
 
+import "container/list"
+
 // FIFOPolicy implements the First-In First-Out policy
 // The cache evicts the elements in the order that they were added to the cache policer
 // It is implemented as a doubly-linked list
 type FIFOPolicy struct {
-	list    *List
-	keyNode map[CacheKey]*Node
+	list    *list.List
+	keyNode map[CacheKey]*list.Element
 }
 
 // NewFIFOPolicy creates a new FIFO cache policer
 func NewFIFOPolicy() CachePolicy {
 	policy := &FIFOPolicy{}
-	policy.list = NewList()
-	policy.keyNode = make(map[CacheKey]*Node)
+	policy.list = list.New()
+	policy.keyNode = make(map[CacheKey]*list.Element)
 	return policy
 }
 
 // Victim selects a cache key for eviction using the FIFO policy
 func (p *FIFOPolicy) Victim() CacheKey {
-	return p.list.Pop().(CacheKey)
+	element := p.list.Back()
+	p.list.Remove(element)
+	return element.Value.(CacheKey)
 }
 
 // Add adds a cache key to the policer, becoming a candidate for eviction
 func (p *FIFOPolicy) Add(key CacheKey) {
-	node := p.list.AppendLeft(key)
+	node := p.list.PushFront(key)
 	p.keyNode[key] = node
 }
 

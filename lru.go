@@ -1,26 +1,30 @@
 package cache
 
+import "container/list"
+
 type LRUPolicy struct {
-	list    *List
-	keyNode map[CacheKey]*Node
+	list    *list.List
+	keyNode map[CacheKey]*list.Element
 }
 
 // NewLRUPolicy creates a new LRU cache policer
 func NewLRUPolicy() CachePolicy {
 	policy := &LRUPolicy{}
-	policy.list = NewList()
-	policy.keyNode = make(map[CacheKey]*Node)
+	policy.list = list.New()
+	policy.keyNode = make(map[CacheKey]*list.Element)
 	return policy
 }
 
 // Victim selects a cache key for eviction using the LRU policy
 func (p *LRUPolicy) Victim() CacheKey {
-	return p.list.Pop().(CacheKey)
+	element := p.list.Back()
+	p.list.Remove(element)
+	return element.Value.(CacheKey)
 }
 
 // Add adds a cache key to the policer, becoming a candidate for eviction
 func (p *LRUPolicy) Add(key CacheKey) {
-	node := p.list.AppendLeft(key)
+	node := p.list.PushFront(key)
 	p.keyNode[key] = node
 }
 
