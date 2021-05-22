@@ -22,6 +22,7 @@ func NewFIFOPolicy() CachePolicy {
 func (p *FIFOPolicy) Victim() CacheKey {
 	element := p.list.Back()
 	p.list.Remove(element)
+	delete(p.keyNode, element.Value.(CacheKey))
 	return element.Value.(CacheKey)
 }
 

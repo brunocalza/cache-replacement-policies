@@ -10,9 +10,9 @@ type LFUItem struct {
 }
 
 type LFUPolicy struct {
-	freqList       map[Frequency]*list.List
-	keyNode        map[CacheKey]*list.Element
-	leastFrequency Frequency
+	freqList     map[Frequency]*list.List
+	keyNode      map[CacheKey]*list.Element
+	minFrequency Frequency
 }
 
 // NewLFUPolicy creates a new LFU cache policer
@@ -20,14 +20,16 @@ func NewLFUPolicy() CachePolicy {
 	policy := &LFUPolicy{}
 	policy.keyNode = make(map[CacheKey]*list.Element)
 	policy.freqList = make(map[Frequency]*list.List)
-	policy.leastFrequency = 1
+	policy.minFrequency = 1
 	return policy
 }
 
 // Victim selects a cache key for eviction using the LFU policy
 func (p *LFUPolicy) Victim() CacheKey {
-	element := p.freqList[p.leastFrequency].Back()
-	p.freqList[p.leastFrequency].Remove(element)
+	fList := p.freqList[p.minFrequency]
+	element := fList.Back()
+	fList.Remove(element)
+	delete(p.keyNode, element.Value.(LFUItem).key)
 	return element.Value.(LFUItem).key
 }
 
@@ -40,7 +42,7 @@ func (p *LFUPolicy) Add(key CacheKey) {
 
 	node := p.freqList[1].PushFront(LFUItem{1, key})
 	p.keyNode[key] = node
-	p.leastFrequency = 1
+	p.minFrequency = 1
 }
 
 // Removes a cache key from the policer, so the key is no longer considered for eviction
@@ -71,8 +73,8 @@ func (p *LFUPolicy) remove(key CacheKey) *list.Element {
 
 	if p.freqList[frequency].Len() == 0 {
 		delete(p.freqList, frequency)
-		if p.leastFrequency == frequency {
-			p.leastFrequency++
+		if p.minFrequency == frequency {
+			p.minFrequency++
 		}
 	}
 
