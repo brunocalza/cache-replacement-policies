@@ -3,160 +3,108 @@ package cache
 import "testing"
 
 func TestFIFOPolicy(t *testing.T) {
+	testCase := [][]interface{}{
+		{"Put", "1", "1"},
+		{"Put", "2", "2"},
+		{"Put", "3", "3"},
+		{"Put", "4", "4"},
+		{"Put", "5", "5"},
+		{"Get", "1", "1"},
+		{"Get", "2", "2"},
+		{"Get", "3", "3"},
+		{"Get", "4", "4"},
+		{"Get", "5", "5"},
+		{"Put", "6", "6"}, // 1 is evicted
+		{"Get", "1", nil},
+		{"Get", "6", "6"},
+		{"Put", "7", "7"}, // 2 is evicted
+		{"Get", "1", nil},
+		{"Get", "2", nil},
+		{"Get", "7", "7"},
+	}
+
 	cache := NewCache(5, FIFO)
-	cache.Put("foo", "bar")
-	cache.Put("foo2", "bar2")
-	cache.Put("foo3", "bar3")
-	cache.Put("foo4", "bar4")
-	cache.Put("foo5", "bar5")
-
-	if value, err := cache.Get("foo"); *value != "bar" || err != nil {
-		t.Errorf("value should be bar, but we got %s", *value)
-	}
-
-	if value, err := cache.Get("foo2"); *value != "bar2" || err != nil {
-		t.Errorf("value should be bar2, but we got %s", *value)
-	}
-
-	if value, err := cache.Get("foo3"); *value != "bar3" || err != nil {
-		t.Errorf("value should be bar3, but we got %s", *value)
-	}
-
-	if value, err := cache.Get("foo4"); *value != "bar4" || err != nil {
-		t.Errorf("value should be bar4, but we got %s", *value)
-	}
-
-	if value, err := cache.Get("foo5"); *value != "bar5" || err != nil {
-		t.Errorf("value should be bar5, but we got %s", *value)
-	}
-
-	cache.Put("foo6", "bar6")
-
-	if value, err := cache.Get("foo"); value != nil || err == nil {
-		t.Error("value should be nil")
-	}
-
-	if value, err := cache.Get("foo6"); *value != "bar6" || err != nil {
-		t.Errorf("value should be bar6, but we got %s", *value)
-	}
-
-	cache.Put("foo7", "bar7")
-
-	if value, err := cache.Get("foo"); value != nil || err == nil {
-		t.Error("value should be nil")
-	}
-
-	if value, err := cache.Get("foo"); value != nil || err == nil {
-		t.Error("value should be nil")
-	}
-
-	if value, err := cache.Get("foo7"); *value != "bar7" || err != nil {
-		t.Errorf("value should be bar7, but we got %s", *value)
-	}
+	test(t, cache, testCase)
 }
 
 func TestLRUPolicy(t *testing.T) {
+	testCase := [][]interface{}{
+		{"Put", "1", "1"},
+		{"Put", "2", "2"},
+		{"Put", "3", "3"},
+		{"Put", "4", "4"},
+		{"Put", "5", "5"},
+		{"Get", "1", "1"},
+		{"Get", "2", "2"},
+		{"Put", "6", "6"}, // 3 is evicted
+		{"Get", "3", nil},
+		{"Get", "1", "1"},
+		{"Get", "6", "6"},
+		{"Put", "7", "7"}, // 4 is evicted
+		{"Get", "4", nil},
+		{"Get", "7", "7"},
+	}
+
 	cache := NewCache(5, LRU)
-	cache.Put("foo", "bar")
-	cache.Put("foo2", "bar2")
-	cache.Put("foo3", "bar3")
-	cache.Put("foo4", "bar4")
-	cache.Put("foo5", "bar5")
-
-	if value, err := cache.Get("foo"); *value != "bar" || err != nil {
-		t.Errorf("value should be bar, but we got %s", *value)
-	}
-
-	if value, err := cache.Get("foo2"); *value != "bar2" || err != nil {
-		t.Errorf("value should be bar2, but we got %s", *value)
-	}
-
-	cache.Put("foo6", "bar6") // foo3 should be removed
-
-	if value, err := cache.Get("foo3"); value != nil || err == nil {
-		t.Error("value should be nil")
-	}
-
-	if value, err := cache.Get("foo"); *value != "bar" || err != nil {
-		t.Errorf("value should be bar, but we got %s", *value)
-	}
-
-	if value, err := cache.Get("foo6"); *value != "bar6" || err != nil {
-		t.Errorf("value should be bar6, but we got %s", *value)
-	}
-
-	cache.Put("foo7", "bar7")
-
-	if value, err := cache.Get("foo4"); value != nil || err == nil {
-		t.Error("value should be nil")
-	}
-	if value, err := cache.Get("foo7"); *value != "bar7" || err != nil {
-		t.Errorf("value should be bar7, but we got %s", *value)
-	}
+	test(t, cache, testCase)
 }
 
 func TestLFUPolicy(t *testing.T) {
+	testCase := [][]interface{}{
+		{"Put", "1", "1"},
+		{"Put", "2", "2"},
+		{"Get", "1", "1"},
+		{"Put", "3", "3"},
+		{"Get", "2", nil},
+	}
+
 	cache := NewCache(2, LFU)
-	cache.Put("foo1", "bar1")
-	cache.Put("foo2", "bar2")
-
-	if value, err := cache.Get("foo1"); *value != "bar1" || err != nil {
-		t.Errorf("value should be bar, but we got %s", *value)
-	}
-
-	cache.Put("foo3", "bar3")
-
-	if value, err := cache.Get("foo2"); value != nil || err == nil {
-		t.Error("value should be nil")
-	}
+	test(t, cache, testCase)
 
 }
 
 func TestClockPolicy(t *testing.T) {
+	testCase := [][]interface{}{
+		{"Put", "1", "1"},
+		{"Put", "2", "2"},
+		{"Put", "3", "3"},
+		{"Put", "4", "4"},
+		{"Put", "5", "5"},
+		{"Get", "1", "1"},
+		{"Get", "2", "2"},
+		{"Get", "3", "3"},
+		{"Get", "4", "4"},
+		{"Get", "5", "5"},
+		{"Put", "6", "6"}, // 1 is evicted
+		{"Get", "1", nil},
+		{"Get", "2", "2"},
+		{"Get", "3", "3"},
+		{"Put", "7", "7"}, // 4 is evicted
+		{"Get", "4", nil},
+	}
+
 	cache := NewCache(5, CLOCK)
-	cache.Put("foo1", "bar1")
-	cache.Put("foo2", "bar2")
-	cache.Put("foo3", "bar3")
-	cache.Put("foo4", "bar4")
-	cache.Put("foo5", "bar5")
+	test(t, cache, testCase)
+}
 
-	if value, err := cache.Get("foo1"); *value != "bar1" || err != nil {
-		t.Errorf("value should be bar1, but we got %s", *value)
-	}
-
-	if value, err := cache.Get("foo2"); *value != "bar2" || err != nil {
-		t.Errorf("value should be bar2, but we got %s", *value)
-	}
-
-	if value, err := cache.Get("foo3"); *value != "bar3" || err != nil {
-		t.Errorf("value should be bar3, but we got %s", *value)
-	}
-
-	if value, err := cache.Get("foo4"); *value != "bar4" || err != nil {
-		t.Errorf("value should be bar4, but we got %s", *value)
-	}
-
-	if value, err := cache.Get("foo5"); *value != "bar5" || err != nil {
-		t.Errorf("value should be bar5, but we got %s", *value)
-	}
-
-	cache.Put("foo6", "bar6") // foo1 is evicted
-
-	if value, err := cache.Get("foo1"); value != nil || err == nil {
-		t.Error("value should be nil")
-	}
-
-	if value, err := cache.Get("foo2"); *value != "bar2" || err != nil {
-		t.Errorf("value should be bar2, but we got %s", *value)
-	}
-
-	if value, err := cache.Get("foo3"); *value != "bar3" || err != nil {
-		t.Errorf("value should be bar3, but we got %s", *value)
-	}
-
-	cache.Put("foo7", "bar7") // foo4 is evicted
-
-	if value, err := cache.Get("foo4"); value != nil || err == nil {
-		t.Error("value should be nil")
+// test is a helper that accepts an slice of operations (e.g. [["Put", "foo", "bar"], ["Get", "foo", "bar"]]) and test the behavior
+func test(t *testing.T, cache *Cache, operations [][]interface{}) {
+	for i := 0; i < len(operations); i++ {
+		operation := operations[i]
+		kind := operation[0]
+		if kind == "Put" {
+			cache.Put(CacheKey(operation[1].(string)), operation[2].(string))
+		} else {
+			value, err := cache.Get(CacheKey(operation[1].(string)))
+			if operation[2] == nil {
+				if value != nil {
+					t.Errorf("key = %s, value should be nil", operation[1].(string))
+				}
+			} else {
+				if err == nil && *value != operation[2].(string) {
+					t.Errorf("value should be %s, but we got %s", operation[2].(string), *value)
+				}
+			}
+		}
 	}
 }
