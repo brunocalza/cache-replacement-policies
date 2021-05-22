@@ -54,7 +54,7 @@ func NewCache(maxSize int, policy PolicyType) *Cache {
 	return cache
 }
 
-func (c *Cache) Put(key CacheKey, value string) error {
+func (c *Cache) Put(key CacheKey, value string) {
 	if c.size == c.maxSize {
 		victimKey := c.policy.Victim()
 		delete(c.data, victimKey)
@@ -63,7 +63,6 @@ func (c *Cache) Put(key CacheKey, value string) error {
 	c.policy.Add(key)
 	c.data[key] = value
 	c.size++
-	return nil
 }
 
 func (c *Cache) Get(key CacheKey) (*string, error) {
