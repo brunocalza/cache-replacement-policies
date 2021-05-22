@@ -50,7 +50,10 @@ func TestLRUPolicy(t *testing.T) {
 }
 
 func TestLFUPolicy(t *testing.T) {
-	testCase := [][]interface{}{
+	var cache *Cache
+	var testCase [][]interface{}
+
+	testCase = [][]interface{}{
 		{"Put", "1", "1"},
 		{"Put", "2", "2"},
 		{"Get", "1", "1"},
@@ -58,7 +61,24 @@ func TestLFUPolicy(t *testing.T) {
 		{"Get", "2", nil},
 	}
 
-	cache := NewCache(2, LFU)
+	cache = NewCache(2, LFU)
+	test(t, cache, testCase)
+
+	testCase = [][]interface{}{
+		{"Put", "1", "1"},
+		{"Put", "2", "2"},
+		{"Get", "1", "1"},
+		{"Put", "3", "3"},
+		{"Get", "2", "2"},
+		{"Put", "4", "4"},
+		{"Put", "5", "5"},
+		{"Get", "3", "3"},
+		{"Get", "1", "1"},
+		{"Put", "6", "6"},
+		{"Get", "4", nil},
+	}
+
+	cache = NewCache(5, LFU)
 	test(t, cache, testCase)
 
 }
