@@ -10,16 +10,14 @@ type CircularList struct {
 }
 
 func (c *CircularList) Append(item interface{}) *ring.Ring {
-	if c.ring == nil {
-		c.ring = ring.New(1)
-		c.ring.Value = item
-		return c.ring
-	}
-
 	newRing := ring.New(1)
 	newRing.Value = item
-	c.ring.Link(newRing)
-	c.ring = newRing
+
+	if c.ring != nil {
+		c.ring.Link(newRing)
+	}
+
+	c.ring = newRing // c.ring always points to the last element
 	return newRing
 }
 
