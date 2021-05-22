@@ -49,9 +49,7 @@ func (p *ClockPolicy) Victim() CacheKey {
 // Add adds a cache key to the policer, becoming a candidate for eviction
 func (p *ClockPolicy) Add(key CacheKey) {
 	node := p.list.Append(&ClockItem{key, true})
-	if p.list.Len() == 1 {
-		p.clockHand = p.list.ring
-	} else if p.clockHand == nil {
+	if p.clockHand == nil { // it means that either the list was empty or a element was just removed
 		p.clockHand = node
 	}
 	p.keyNode[key] = node
@@ -65,7 +63,7 @@ func (p *ClockPolicy) Remove(key CacheKey) {
 	}
 
 	if p.clockHand == node {
-		p.clockHand = p.clockHand.Next()
+		p.clockHand = p.clockHand.Prev()
 	}
 	p.list.Remove(node)
 	delete(p.keyNode, key)
