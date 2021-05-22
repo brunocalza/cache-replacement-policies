@@ -2,22 +2,14 @@
 
 Implementation of several cache replacement policies for learning purposes
 
-## Current implementations
+## Implementations
 
-- First In First Out
+- FIFO
 - LRU
 - LFU
-
-## Future implementations
-
-- Clock
+- CLOCK
 
 ## TODOS
 
-- Refactor APIs for error handling
 - Make policies private?
-- Implement Clock Replacement Policy
-
-## First In First Out policy
-
-Evicts the elements in the order that they were added to the cache policer
+- Improve testing
