@@ -39,6 +39,8 @@ func GetCachePolicy(policy PolicyType) CachePolicy {
 		return NewLRUPolicy()
 	case LFU:
 		return NewLFUPolicy()
+	case CLOCK:
+		return NewClockPolicy()
 	default:
 		return NewFIFOPolicy()
 	}
