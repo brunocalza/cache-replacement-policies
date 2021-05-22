@@ -19,6 +19,7 @@ func NewFIFOPolicy() CachePolicy {
 }
 
 // Victim selects a cache key for eviction using the FIFO policy
+// removes the last element of the queue
 func (p *FIFOPolicy) Victim() CacheKey {
 	element := p.list.Back()
 	p.list.Remove(element)
