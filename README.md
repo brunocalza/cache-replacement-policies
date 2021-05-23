@@ -1,6 +1,7 @@
 # Cache replacement policies
 
-Implementation of several cache replacement policies for learning purposes
+Implementation of several cache replacement policies for learning purposes.
+Check the blog post [The Cache is Full](https://brunocalza.me/the-cache-is-full/).
 
 ## Implementations
 
@@ -8,8 +9,3 @@ Implementation of several cache replacement policies for learning purposes
 - LRU
 - LFU
 - CLOCK
-
-## TODOS
-
-- Make policies private?
-- Improve testing
